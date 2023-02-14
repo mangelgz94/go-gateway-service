@@ -3,7 +3,7 @@ package users
 import (
 	"context"
 
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/services/users/models"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
 	"github.com/pkg/errors"
 )
 

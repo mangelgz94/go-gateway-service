@@ -5,13 +5,21 @@ import (
 	"testing"
 
 	proto "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/app/users_api/proto/users-api"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/services/users/models"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const (
 	getUsers = "GetUsers"
+)
+
+var (
+	emptyContext  = context.Background()
+	internalError = errors.New("internal error")
 )
 
 type usersAPITestSuite struct {
@@ -42,14 +50,69 @@ type getUsersTestCaseArguments struct {
 }
 
 type usersServiceGetUsersMockSetup struct {
-	argument       *context.Context
+	argument       context.Context
 	expectedResult []*models.User
 	expectedError  error
 }
 
 func (suite *usersAPITestSuite) TestGetUsers() {
 	testCases := []*getUsersTestCase{
-		{},
+		{
+			name: "success - get users",
+			arguments: &getUsersTestCaseArguments{
+				ctx:     emptyContext,
+				request: &proto.GetUsersRequest{},
+			},
+			usersServiceGetUsersMockSetup: &usersServiceGetUsersMockSetup{
+				argument: emptyContext,
+				expectedResult: []*models.User{
+					{
+						FirstName:   "John",
+						LastName:    "Doe",
+						Address:     "My Address",
+						Birthday:    "01-01-2000",
+						PhoneNumber: "+123456789",
+					},
+					{
+						FirstName:   "Jane",
+						LastName:    "Doe",
+						Address:     "Not My Address",
+						Birthday:    "01-01-2001",
+						PhoneNumber: "+987654321",
+					},
+				},
+			},
+			expectedResult: &proto.GetUsersResponse{
+				Users: []*proto.User{
+					{
+						FirstName:   "John",
+						LastName:    "Doe",
+						Address:     "My Address",
+						Birthday:    "01-01-2000",
+						PhoneNumber: "+123456789",
+					},
+					{
+						FirstName:   "Jane",
+						LastName:    "Doe",
+						Address:     "Not My Address",
+						Birthday:    "01-01-2001",
+						PhoneNumber: "+987654321",
+					},
+				},
+			},
+		},
+		{
+			name: "error - get users",
+			arguments: &getUsersTestCaseArguments{
+				ctx:     emptyContext,
+				request: &proto.GetUsersRequest{},
+			},
+			usersServiceGetUsersMockSetup: &usersServiceGetUsersMockSetup{
+				argument:      emptyContext,
+				expectedError: internalError,
+			},
+			expectedError: status.Error(codes.Internal, "failed to get users"),
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -65,7 +128,11 @@ func (suite *usersAPITestSuite) TestGetUsers() {
 			usersService.AssertExpectations(suiteT)
 			suite.Equal(testCase.expectedResult, users)
 			if err != nil {
-				suite.EqualError(err, testCase.expectedError.Error())
+				if testCase.expectedError != nil {
+					suite.EqualError(err, testCase.expectedError.Error())
+				} else if testCase.expectedError == nil {
+					suite.Errorf(err, "unexpected error returned")
+				}
 			}
 		})
 	}

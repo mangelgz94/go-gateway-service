@@ -3,7 +3,7 @@ package file
 import (
 	"context"
 
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/services/users/models"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
 )
 
 type FileRepository struct {
