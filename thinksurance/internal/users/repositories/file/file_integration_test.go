@@ -9,7 +9,6 @@ import (
 
 	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
 	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/repositories/file"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -88,7 +87,15 @@ func (suite *FileRepositoryTestSuite) TestGetUsers() {
 				  "phone_number": "1234567890"
 				}`},
 			},
-			expectedError: errors.Wrap(errors.Wrap(errors.New("invalid character 'c' looking for beginning of value"), "json Unmarshal"), "getUser"),
+			expectedResult: []*models.User{
+				{
+					FirstName:   "John",
+					LastName:    "Doe",
+					Birthday:    "01-01-2000",
+					Address:     "His Address",
+					PhoneNumber: "1234567890",
+				},
+			},
 		},
 	}
 

@@ -3,12 +3,14 @@ package file
 import (
 	"context"
 	"encoding/json"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
-	"github.com/pkg/errors"
-	"golang.org/x/sync/errgroup"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sync"
+
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 type FileRepository struct {
@@ -28,48 +30,47 @@ func (f *FileRepository) GetUsers(context context.Context) ([]*models.User, erro
 		return nil, errors.Wrap(err, "filepath Walk")
 	}
 
-	var errGroup errgroup.Group
+	var wg sync.WaitGroup
 	usersChannel := make(chan *models.User, len(files))
 	for _, file := range files {
+		wg.Add(1)
 		file := file
-		errGroup.Go(func() error {
-			err := f.getUser(file, usersChannel)
-			if err != nil {
-				return errors.Wrap(err, "getUser")
-			}
+		go func() {
+			defer wg.Done()
+			f.getUser(file, usersChannel)
+		}()
 
-			return nil
-		})
 	}
 
-	if err := errGroup.Wait(); err != nil {
-		return nil, err
-	}
+	wg.Wait()
+	close(usersChannel)
 
 	users := make([]*models.User, 0, len(files))
-	for i := 0; i < len(files); i++ {
-		users = append(users, <-usersChannel)
+	for user := range usersChannel {
+		users = append(users, user)
 	}
 
 	return users, nil
 
 }
 
-func (f *FileRepository) getUser(file string, channel chan *models.User) error {
+func (f *FileRepository) getUser(file string, channel chan *models.User) {
 	userFile, err := os.ReadFile(file)
 	if err != nil {
-		return errors.Wrap(err, "os ReadFile")
+		log.Errorf("Cannot read file %s, error: %v", file, err)
+
+		return
 	}
 
 	var user *models.User
 	err = json.Unmarshal(userFile, &user)
 	if err != nil {
-		return errors.Wrap(err, "json Unmarshal")
+		log.Errorf("Cannot unmarshal file %s, error: %v", file, err)
+
+		return
 	}
 
 	channel <- user
-
-	return nil
 }
 
 func New(config *Config) *FileRepository {
