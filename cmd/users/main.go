@@ -1,12 +1,12 @@
 package main
 
 import (
+	users_api2 "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/users_api"
 	"net"
 	"os"
 	"os/signal"
 	"strconv"
 
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/app/users_api"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -37,7 +37,7 @@ func setupInterruptCloseHandler() {
 }
 
 func createApp() *cli.App {
-	var config users_api.Config
+	var config users_api2.Config
 	app := cli.NewApp()
 	app.Version = "1.0"
 	app.Flags = []cli.Flag{
@@ -115,7 +115,7 @@ func createApp() *cli.App {
 		if err != nil {
 			return errors.Wrap(err, "net Listen")
 		}
-		grpcServer := users_api.New(&config)
+		grpcServer := users_api2.New(&config)
 		grpcServer.Start()
 		log.Infof("gRPC service listening on port %d", config.Port)
 		if err := grpcServer.Server.Serve(listener); err != nil {

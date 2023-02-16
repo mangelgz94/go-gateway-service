@@ -1,3 +1,6 @@
 *
 */
 !.gitignore
+
+!jane.json
+!john.json

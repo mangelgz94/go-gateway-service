@@ -2,13 +2,13 @@ package file_test
 
 import (
 	"context"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
+	file2 "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/repositories/file"
 	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
 
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/repositories/file"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -22,14 +22,9 @@ var (
 )
 
 func loadFileDirectory() string {
-	fileDirectory, _ := os.LookupEnv("REPOSITORY_FILE_DIRECTORY")
-	if fileDirectory == "" {
-		filePath, _ := filepath.Abs("../../../../../users_json")
+	filePath, _ := filepath.Abs("../../../../users_json")
 
-		return filePath
-	}
-
-	return fileDirectory
+	return filePath
 }
 
 type getUsersTestCase struct {
@@ -48,6 +43,21 @@ func (suite *FileRepositoryTestSuite) TestGetUsers() {
 
 	fileUsers := make([]string, 0, 100)
 	users := make([]*models.User, 0, 100)
+	users = append(users, &models.User{
+		FirstName:   "Jane",
+		LastName:    "Doe",
+		Address:     "Her Address",
+		Birthday:    "01-01-2001",
+		PhoneNumber: "0987654321",
+	})
+	users = append(users, &models.User{
+		FirstName:   "John",
+		LastName:    "Doe",
+		Address:     "His Address",
+		Birthday:    "01-01-2000",
+		PhoneNumber: "1234567890",
+	})
+
 	for i := 0; i < 99; i++ {
 		fileUsers = append(fileUsers, `
 				{
@@ -75,7 +85,7 @@ func (suite *FileRepositoryTestSuite) TestGetUsers() {
 			expectedResult: users,
 		},
 		{
-			name: "error - corrupted file",
+			name: "success - with a corrupted file",
 			arguments: &getUsersTestCaseArguments{
 				ctx: emptyBackground,
 				users: []string{`corrupted`,
@@ -95,13 +105,27 @@ func (suite *FileRepositoryTestSuite) TestGetUsers() {
 					Address:     "His Address",
 					PhoneNumber: "1234567890",
 				},
+				{
+					FirstName:   "Jane",
+					LastName:    "Doe",
+					Address:     "Her Address",
+					Birthday:    "01-01-2001",
+					PhoneNumber: "0987654321",
+				},
+				{
+					FirstName:   "John",
+					LastName:    "Doe",
+					Address:     "His Address",
+					Birthday:    "01-01-2000",
+					PhoneNumber: "1234567890",
+				},
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
 		suite.Run(testCase.name, func() {
-			fileRepository := file.New(&file.Config{FileDirectory: fileDirectory})
+			fileRepository := file2.New(&file2.Config{FileDirectory: fileDirectory})
 			for index, user := range testCase.arguments.users {
 
 				_ = os.WriteFile(fileDirectory+"/"+strconv.Itoa(index)+".json", []byte(user), 0644)

@@ -3,12 +3,12 @@ package file
 import (
 	"context"
 	"encoding/json"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"sync"
 
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )

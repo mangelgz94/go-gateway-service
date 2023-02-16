@@ -2,9 +2,9 @@ package users
 
 import (
 	"context"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
 	"testing"
 
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"

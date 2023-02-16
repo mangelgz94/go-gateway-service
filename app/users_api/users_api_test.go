@@ -2,10 +2,10 @@ package users_api
 
 import (
 	"context"
+	proto "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/users_api/proto/users-api"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
 	"testing"
 
-	proto "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/app/users_api/proto/users-api"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"

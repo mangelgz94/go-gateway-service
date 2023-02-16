@@ -2,12 +2,12 @@ package users_api
 
 import (
 	"context"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/users_api/proto/users-api"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
+	file2 "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/repositories/file"
 	"time"
 
-	proto "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/app/users_api/proto/users-api"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/models"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/thinksurance/internal/users/repositories/file"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -20,13 +20,13 @@ type usersService interface {
 }
 
 type GrpcServer struct {
-	proto.UnimplementedUsersAPIServiceServer
+	users_api.UnimplementedUsersAPIServiceServer
 	Server       *grpc.Server
 	usersService usersService
 	config       *Config
 }
 
-func (g *GrpcServer) GetUsers(ctx context.Context, req *proto.GetUsersRequest) (*proto.GetUsersResponse, error) {
+func (g *GrpcServer) GetUsers(ctx context.Context, req *users_api.GetUsersRequest) (*users_api.GetUsersResponse, error) {
 	users, err := g.usersService.GetUsers(ctx)
 	if err != nil {
 		log.Errorf("failed to get users, error: %v", err)
@@ -34,7 +34,7 @@ func (g *GrpcServer) GetUsers(ctx context.Context, req *proto.GetUsersRequest) (
 		return nil, status.Error(codes.Internal, "failed to get users")
 	}
 
-	return &proto.GetUsersResponse{
+	return &users_api.GetUsersResponse{
 		Users: mapUsersToGRPC(users),
 	}, nil
 }
@@ -54,14 +54,14 @@ func (g *GrpcServer) Start() {
 	}
 
 	grpcServer := grpc.NewServer(grpc.KeepaliveEnforcementPolicy(keepAliveEnforcementPolicy), grpc.KeepaliveParams(keepAliveServerParameters))
-	proto.RegisterUsersAPIServiceServer(grpcServer, g)
+	users_api.RegisterUsersAPIServiceServer(grpcServer, g)
 	g.Server = grpcServer
 
 	g.newServices()
 }
 
 func (g *GrpcServer) newServices() {
-	repository := file.New(&file.Config{
+	repository := file2.New(&file2.Config{
 		FileDirectory: g.config.RepositoryFileDirectory,
 	})
 
