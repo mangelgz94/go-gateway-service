@@ -1,0 +1,17 @@
+syntax = "proto3";
+option go_package = "/find-number-position-api;find_number_position_api";
+
+package find_number_position_api;
+
+service FindNumberPositionAPIService {
+  rpc GetNumberPosition(GetNumberPositionRequest) returns (GetNumberPositionResponse);
+}
+
+
+message GetNumberPositionRequest {
+  int64 number = 1;
+}
+
+message GetNumberPositionResponse {
+  int64 position = 1;
+}

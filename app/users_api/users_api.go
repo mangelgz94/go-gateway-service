@@ -2,7 +2,7 @@ package users_api
 
 import (
 	"context"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/users_api/proto/users-api"
+	proto "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/users_api/proto/users-api"
 	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users"
 	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
 	file2 "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/repositories/file"
@@ -20,13 +20,13 @@ type usersService interface {
 }
 
 type GrpcServer struct {
-	users_api.UnimplementedUsersAPIServiceServer
+	proto.UnimplementedUsersAPIServiceServer
 	Server       *grpc.Server
 	usersService usersService
 	config       *Config
 }
 
-func (g *GrpcServer) GetUsers(ctx context.Context, req *users_api.GetUsersRequest) (*users_api.GetUsersResponse, error) {
+func (g *GrpcServer) GetUsers(ctx context.Context, req *proto.GetUsersRequest) (*proto.GetUsersResponse, error) {
 	users, err := g.usersService.GetUsers(ctx)
 	if err != nil {
 		log.Errorf("failed to get users, error: %v", err)
@@ -34,7 +34,7 @@ func (g *GrpcServer) GetUsers(ctx context.Context, req *users_api.GetUsersReques
 		return nil, status.Error(codes.Internal, "failed to get users")
 	}
 
-	return &users_api.GetUsersResponse{
+	return &proto.GetUsersResponse{
 		Users: mapUsersToGRPC(users),
 	}, nil
 }
@@ -54,7 +54,7 @@ func (g *GrpcServer) Start() {
 	}
 
 	grpcServer := grpc.NewServer(grpc.KeepaliveEnforcementPolicy(keepAliveEnforcementPolicy), grpc.KeepaliveParams(keepAliveServerParameters))
-	users_api.RegisterUsersAPIServiceServer(grpcServer, g)
+	proto.RegisterUsersAPIServiceServer(grpcServer, g)
 	g.Server = grpcServer
 
 	g.newServices()
