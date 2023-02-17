@@ -30,8 +30,8 @@ func (f *FindNumberPositionService) fillNumbers() {
 }
 
 func New(config *Config) *FindNumberPositionService {
-	findNUmberService := &FindNumberPositionService{config: config}
-	findNUmberService.fillNumbers()
+	findNumberService := &FindNumberPositionService{config: config}
+	findNumberService.fillNumbers()
 
-	return findNUmberService
+	return findNumberService
 }

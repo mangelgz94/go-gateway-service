@@ -5,7 +5,7 @@ touch build/coverage.out
 
 go test ./... -cover -coverprofile=build/coverage.part -covermode=count -v ./
 
-if [-$? -ne 0]; then
+if [ $? -ne 0 ]; then
   exit
 fi
 
