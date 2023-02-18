@@ -69,10 +69,6 @@ func (s *GatewayServer) Shutdown() {
 	}
 }
 
-func respondWithError(writer http.ResponseWriter, code int, message string) {
-	respondWithJSON(writer, code, map[string]string{"error": message})
-}
-
 func respondWithJSON(writer http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)
 

@@ -4,5 +4,5 @@ type findNumberPosition struct {
 }
 
 func NewFindNumberPositionProvider() *findNumberPosition {
-
+	return &findNumberPosition{}
 }

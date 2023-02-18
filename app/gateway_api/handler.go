@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/gateway_api/middlewares"
 	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/gateway_api/middlewares/basic_auth"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -48,9 +49,16 @@ func (g *GatewayServer) FindNumberPositionHandler() *Handler {
 }
 
 func (g *GatewayServer) findNumberPosition(writer http.ResponseWriter, request *http.Request) {
+	if !isUserAuthorized(request) {
+
+		respondWithJSON(writer, http.StatusUnauthorized, findNumberPositionResponse{Error: "unauthorized"})
+
+		return
+	}
+
 	numberParameter, err := validateNumberParameter(request)
 	if err != nil {
-		respondWithError(writer, http.StatusBadRequest, "invalid number")
+		respondWithJSON(writer, http.StatusBadRequest, findNumberPositionResponse{Error: "invalid number"})
 
 		return
 	}
@@ -58,7 +66,7 @@ func (g *GatewayServer) findNumberPosition(writer http.ResponseWriter, request *
 	number, err := g.gatewayService.FindNumberPosition(request.Context(), numberParameter)
 	if err != nil {
 		log.Errorf("Failed to find number position, %v", err)
-		respondWithError(writer, http.StatusInternalServerError, "internal server error")
+		respondWithJSON(writer, http.StatusInternalServerError, findNumberPositionResponse{Error: "internal server error"})
 
 		return
 	}
@@ -67,15 +75,22 @@ func (g *GatewayServer) findNumberPosition(writer http.ResponseWriter, request *
 }
 
 func (g *GatewayServer) getUsers(writer http.ResponseWriter, request *http.Request) {
-	users, err := g.gatewayService.GetUsers(request.Context())
-	if err != nil {
-		log.Errorf("Failed to get users, %v", err)
-		respondWithError(writer, http.StatusInternalServerError, "internal server error")
+	if !isUserAuthorized(request) {
+
+		respondWithJSON(writer, http.StatusUnauthorized, getUsersResponse{Error: "unauthorized"})
 
 		return
 	}
 
-	respondWithJSON(writer, http.StatusOK, users)
+	users, err := g.gatewayService.GetUsers(request.Context())
+	if err != nil {
+		log.Errorf("Failed to get users, %v", err)
+		respondWithJSON(writer, http.StatusInternalServerError, getUsersResponse{Error: "internal server error"})
+
+		return
+	}
+
+	respondWithJSON(writer, http.StatusOK, getUsersResponse{Users: users})
 }
 
 func validateNumberParameter(request *http.Request) (int, error) {
@@ -90,4 +105,8 @@ func validateNumberParameter(request *http.Request) (int, error) {
 	}
 
 	return number, nil
+}
+
+func isUserAuthorized(request *http.Request) bool {
+	return request.Context().Value(middlewares.IsUserAuthorized).(bool)
 }

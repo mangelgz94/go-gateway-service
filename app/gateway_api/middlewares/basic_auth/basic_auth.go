@@ -1,10 +1,12 @@
 package basic_auth
 
 import (
+	"context"
 	"crypto/sha256"
 	"crypto/subtle"
-	"encoding/json"
 	"net/http"
+
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/gateway_api/middlewares"
 )
 
 type BasicAuthMiddleware struct {
@@ -13,6 +15,7 @@ type BasicAuthMiddleware struct {
 
 func (m *BasicAuthMiddleware) HandleAuthorization(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var isUserAuthorized bool
 		username, password, ok := r.BasicAuth()
 		if ok {
 			usernameHash := sha256.Sum256([]byte(username))
@@ -24,18 +27,13 @@ func (m *BasicAuthMiddleware) HandleAuthorization(next http.Handler) http.Handle
 			passwordMatch := subtle.ConstantTimeCompare(passwordHash[:], expectedPasswordHash[:]) == 1
 
 			if usernameMatch && passwordMatch {
-				next.ServeHTTP(w, r)
-				return
+				isUserAuthorized = true
 			}
 		}
 
-		w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-		response, _ := json.Marshal(map[string]string{"error": "Unauthorized"})
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write(response)
-
-		return
+		requestContext := context.WithValue(r.Context(), middlewares.IsUserAuthorized, isUserAuthorized)
+		r = r.WithContext(requestContext)
+		next.ServeHTTP(w, r)
 	})
 }
 
