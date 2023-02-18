@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/gateway/models"
+	"github.com/pkg/errors"
 )
 
 type usersProvider interface {
@@ -20,11 +21,21 @@ type GatewayService struct {
 }
 
 func (g *GatewayService) FindNumberPosition(ctx context.Context, number int) (int, error) {
-	return 0, nil
+	numberPosition, err := g.findNumberPositionProvider.FindNumberPosition(ctx, number)
+	if err != nil {
+		return 0, errors.Wrap(err, "findNumberPositionProvider FindNumberPosition")
+	}
+
+	return numberPosition, nil
 }
 
 func (g *GatewayService) GetUsers(ctx context.Context) ([]*models.User, error) {
-	return nil, nil
+	users, err := g.usersProvider.GetUsers(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "usersProvider GetUsers")
+	}
+
+	return users, nil
 }
 
 func New(usersProvider usersProvider, findNumberPositionProvider findNumberPositionProvider) *GatewayService {
