@@ -1,0 +1,22 @@
+syntax = "proto3";
+option go_package = "/users-api;users_api";
+
+package users_api;
+
+service UsersAPIService {
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
+}
+
+message User {
+  string first_name = 1;
+  string last_name = 2;
+  string birthday = 3;
+  string address = 4;
+  string phone_number = 5;
+}
+
+message GetUsersRequest {}
+
+message GetUsersResponse {
+  repeated User users = 1;
+}

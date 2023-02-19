@@ -21,8 +21,8 @@ type GrpcServer struct {
 	config                    *Config
 }
 
-func (g *GrpcServer) GetNumberPosition(ctx context.Context, req *proto.GetNumberPositionRequest) (*proto.GetNumberPositionResponse, error) {
-	return &proto.GetNumberPositionResponse{
+func (g *GrpcServer) FindNumberPosition(ctx context.Context, req *proto.FindNumberPositionRequest) (*proto.FindNumberPositionResponse, error) {
+	return &proto.FindNumberPositionResponse{
 		Position: int64(g.findNumberPositionService.FindNumberPosition(ctx, int(req.Number))),
 	}, nil
 }

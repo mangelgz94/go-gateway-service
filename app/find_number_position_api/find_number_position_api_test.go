@@ -30,13 +30,13 @@ func (f *fakeFindNumberPositionService) FindNumberPosition(context context.Conte
 }
 
 type findNumberPositionTestCase struct {
-	name                                                string
-	arguments                                           *findNumberPositionTestCaseArguments
-	findNumberPositionServiceGetNumberPositionMockSetup *findNumberPositionServiceGetNumberPositionMockSetup
-	expectedResult                                      *proto.GetNumberPositionResponse
+	name                                                 string
+	arguments                                            *findNumberPositionTestCaseArguments
+	findNumberPositionServiceFindNumberPositionMockSetup *findNumberPositionServiceFindNumberPositionMockSetup
+	expectedResult                                       *proto.FindNumberPositionResponse
 }
 
-type findNumberPositionServiceGetNumberPositionMockSetup struct {
+type findNumberPositionServiceFindNumberPositionMockSetup struct {
 	arguments      *findNumberPositionMethodArguments
 	expectedResult int
 }
@@ -52,16 +52,16 @@ func (suite *findNumberPositionAPITestSuite) TestFindNumberPosition() {
 			name: "success - find number position",
 			arguments: &findNumberPositionTestCaseArguments{
 				ctx:     emptyContext,
-				request: &proto.GetNumberPositionRequest{Number: 1},
+				request: &proto.FindNumberPositionRequest{Number: 1},
 			},
-			findNumberPositionServiceGetNumberPositionMockSetup: &findNumberPositionServiceGetNumberPositionMockSetup{
+			findNumberPositionServiceFindNumberPositionMockSetup: &findNumberPositionServiceFindNumberPositionMockSetup{
 				arguments: &findNumberPositionMethodArguments{
 					ctx:    emptyContext,
 					number: 1,
 				},
 				expectedResult: 1,
 			},
-			expectedResult: &proto.GetNumberPositionResponse{
+			expectedResult: &proto.FindNumberPositionResponse{
 				Position: 1,
 			},
 		},
@@ -71,13 +71,13 @@ func (suite *findNumberPositionAPITestSuite) TestFindNumberPosition() {
 		suiteT := suite.T()
 		suite.Run(testCase.name, func() {
 			findNumberPositionService := &fakeFindNumberPositionService{}
-			mockSetup := testCase.findNumberPositionServiceGetNumberPositionMockSetup
+			mockSetup := testCase.findNumberPositionServiceFindNumberPositionMockSetup
 			if mockSetup != nil {
 				findNumberPositionService.On(findNumberPosition, mockSetup.arguments.ctx, mockSetup.arguments.number).Return(mockSetup.expectedResult)
 			}
 
 			grpcServer := &GrpcServer{findNumberPositionService: findNumberPositionService}
-			response, _ := grpcServer.GetNumberPosition(testCase.arguments.ctx, testCase.arguments.request)
+			response, _ := grpcServer.FindNumberPosition(testCase.arguments.ctx, testCase.arguments.request)
 			findNumberPositionService.AssertExpectations(suiteT)
 			suite.Equal(testCase.expectedResult, response)
 		})
@@ -87,7 +87,7 @@ func (suite *findNumberPositionAPITestSuite) TestFindNumberPosition() {
 
 type findNumberPositionTestCaseArguments struct {
 	ctx     context.Context
-	request *proto.GetNumberPositionRequest
+	request *proto.FindNumberPositionRequest
 }
 
 func TestFindNumberPositionAPITestSuite(t *testing.T) {
