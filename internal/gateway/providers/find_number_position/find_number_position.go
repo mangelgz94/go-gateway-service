@@ -18,6 +18,10 @@ type FindNumberPositionProvider struct {
 	findNumberPositionAPIConnector findNumberPositionAPIConnector
 }
 
+func (f *FindNumberPositionProvider) Shutdown() {
+	f.grpClient.CloseConnection()
+}
+
 func (f *FindNumberPositionProvider) FindNumberPosition(ctx context.Context, number int) (int, error) {
 	numberResponse, err := f.findNumberPositionAPIConnector.FindNumberPosition(ctx, &findNumberPositionApi.FindNumberPositionRequest{Number: int64(number)})
 	if err != nil {

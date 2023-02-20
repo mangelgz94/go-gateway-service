@@ -2,13 +2,13 @@ package file_test
 
 import (
 	"context"
-	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
-	file2 "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/repositories/file"
 	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
 
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/repositories/file"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -125,7 +125,7 @@ func (suite *FileRepositoryTestSuite) TestGetUsers() {
 
 	for _, testCase := range testCases {
 		suite.Run(testCase.name, func() {
-			fileRepository := file2.New(&file2.Config{FileDirectory: fileDirectory})
+			fileRepository := file.New(&file.Config{FileDirectory: fileDirectory})
 			for index, user := range testCase.arguments.users {
 
 				_ = os.WriteFile(fileDirectory+"/"+strconv.Itoa(index)+".json", []byte(user), 0644)

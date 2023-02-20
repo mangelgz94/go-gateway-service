@@ -34,6 +34,10 @@ func (f *fakeUsersProvider) GetUsers(ctx context.Context) ([]*models.User, error
 	return args.Get(0).([]*models.User), args.Error(1)
 }
 
+func (f *fakeUsersProvider) Shutdown() {
+
+}
+
 type fakeFindNumberPositionProvider struct {
 	mock.Mock
 }
@@ -42,6 +46,10 @@ func (f *fakeFindNumberPositionProvider) FindNumberPosition(ctx context.Context,
 	args := f.Called(ctx, number)
 
 	return args.Get(0).(int), args.Error(1)
+}
+
+func (f *fakeFindNumberPositionProvider) Shutdown() {
+
 }
 
 type getUsersTestCase struct {

@@ -2,7 +2,6 @@ package find_number_position
 
 import (
 	"context"
-	"sort"
 )
 
 type FindNumberPositionService struct {
@@ -11,13 +10,22 @@ type FindNumberPositionService struct {
 }
 
 func (f *FindNumberPositionService) FindNumberPosition(ctx context.Context, number int) int {
-	//Go has already a binary search function for a slice of ints
-	index := sort.SearchInts(f.numbers, number)
-	if index == len(f.numbers) {
-		return -1
+	numberPosition := -1
+	start := 0
+	end := len(f.numbers) - 1
+	for start <= end {
+		mid := (start + end) / 2
+		if f.numbers[mid] == number {
+			numberPosition = mid
+			break
+		} else if f.numbers[mid] < number {
+			start = mid + 1
+		} else if f.numbers[mid] > number {
+			end = mid - 1
+		}
 	}
 
-	return index
+	return numberPosition
 }
 
 func (f *FindNumberPositionService) fillNumbers() {

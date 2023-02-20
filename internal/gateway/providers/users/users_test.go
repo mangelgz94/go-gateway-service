@@ -61,7 +61,8 @@ func (suite *UsersTestSuite) TestGetUsers() {
 			argument: emptyContext,
 			usersAPIConnectorGetUsersMockSetup: &usersAPIConnectorGetUsersMockSetup{
 				arguments: &getUsersMethodArguments{
-					ctx: emptyContext,
+					ctx:     emptyContext,
+					request: &usersApi.GetUsersRequest{},
 				},
 				expectedResult: &usersApi.GetUsersResponse{
 					Users: []*usersApi.User{
@@ -90,7 +91,8 @@ func (suite *UsersTestSuite) TestGetUsers() {
 			argument: emptyContext,
 			usersAPIConnectorGetUsersMockSetup: &usersAPIConnectorGetUsersMockSetup{
 				arguments: &getUsersMethodArguments{
-					ctx: emptyContext,
+					ctx:     emptyContext,
+					request: &usersApi.GetUsersRequest{},
 				},
 				expectedError: internalError,
 			},

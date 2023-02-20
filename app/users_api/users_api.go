@@ -2,12 +2,15 @@ package users_api
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"time"
+
 	proto "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/users_api/proto/users-api"
 	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users"
 	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/models"
-	file2 "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/repositories/file"
-	"time"
-
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/internal/users/repositories/file"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -39,7 +42,7 @@ func (g *GrpcServer) GetUsers(ctx context.Context, req *proto.GetUsersRequest) (
 	}, nil
 }
 
-func (g *GrpcServer) Start() {
+func (g *GrpcServer) Start() error {
 	keepAliveEnforcementPolicy := keepalive.EnforcementPolicy{
 		MinTime:             time.Duration(g.config.ServerKeepAliveEnforcementMinTime) * time.Second,
 		PermitWithoutStream: g.config.ServerKeepAlivePermitWithoutStream,
@@ -57,15 +60,31 @@ func (g *GrpcServer) Start() {
 	proto.RegisterUsersAPIServiceServer(grpcServer, g)
 	g.Server = grpcServer
 
-	g.newServices()
+	err := g.newServices()
+	if err != nil {
+		return errors.Wrap(err, "newServices")
+	}
+
+	return nil
 }
 
-func (g *GrpcServer) newServices() {
-	repository := file2.New(&file2.Config{
-		FileDirectory: g.config.RepositoryFileDirectory,
+func (g *GrpcServer) newServices() error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return errors.Wrap(err, "os Getwd")
+	}
+
+	fileDirectory, err := filepath.Abs(g.config.RepositoryFileDirectory)
+	if err != nil {
+		return errors.Wrap(err, "filepath Abs")
+	}
+	repository := file.New(&file.Config{
+		FileDirectory: wd + fileDirectory,
 	})
 
 	g.usersService = users.New(repository)
+
+	return nil
 }
 
 func New(config *Config) *GrpcServer {

@@ -1,12 +1,12 @@
 package main
 
 import (
-	users_api2 "github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/users_api"
 	"net"
 	"os"
 	"os/signal"
 	"strconv"
 
+	"github.com/mangelgz94/thinksurance-miguel-angel-gonzalez-morera/app/users_api"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -37,7 +37,7 @@ func setupInterruptCloseHandler() {
 }
 
 func createApp() *cli.App {
-	var config users_api2.Config
+	var config users_api.Config
 	app := cli.NewApp()
 	app.Version = "1.0"
 	app.Flags = []cli.Flag{
@@ -51,7 +51,7 @@ func createApp() *cli.App {
 		&cli.StringFlag{
 			Name:        "REPOSITORY_FILE_DIRECTORY",
 			EnvVars:     []string{"REPOSITORY_FILE_DIRECTORY"},
-			Value:       "../../users",
+			Value:       "/users_json",
 			Usage:       "file directory where file users are",
 			Destination: &config.RepositoryFileDirectory,
 		},
@@ -115,8 +115,11 @@ func createApp() *cli.App {
 		if err != nil {
 			return errors.Wrap(err, "net Listen")
 		}
-		grpcServer := users_api2.New(&config)
-		grpcServer.Start()
+		grpcServer := users_api.New(&config)
+		err = grpcServer.Start()
+		if err != nil {
+			return errors.Wrap(err, "grpcServer Start")
+		}
 		log.Infof("gRPC service listening on port %d", config.Port)
 		if err := grpcServer.Server.Serve(listener); err != nil {
 			return errors.Wrap(err, "Server Serve")

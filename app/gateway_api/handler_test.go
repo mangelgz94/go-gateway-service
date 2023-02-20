@@ -33,6 +33,10 @@ type fakeGatewayService struct {
 	mock.Mock
 }
 
+func (f *fakeGatewayService) Shutdown() {
+
+}
+
 func (f *fakeGatewayService) GetUsers(ctx context.Context) ([]*models.User, error) {
 	args := f.Called(ctx)
 

@@ -41,7 +41,7 @@ func (g *GatewayServer) GetUsersHandler() *Handler {
 func (g *GatewayServer) FindNumberPositionHandler() *Handler {
 	return &Handler{
 		Route: func(r *mux.Route) {
-			r.Path("find_number_position").Methods(http.MethodGet)
+			r.Path("/find_number_position").Methods(http.MethodGet)
 		},
 		Func:       g.findNumberPosition,
 		Middleware: basic_auth.New(&basic_auth.BasicAuthConfig{AuthUser: g.config.AuthUser, AuthPassword: g.config.AuthPassword}),

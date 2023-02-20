@@ -9,15 +9,27 @@ import (
 
 type usersProvider interface {
 	GetUsers(ctx context.Context) ([]*models.User, error)
+	Shutdown()
 }
 
 type findNumberPositionProvider interface {
 	FindNumberPosition(ctx context.Context, number int) (int, error)
+	Shutdown()
 }
 
 type GatewayService struct {
 	usersProvider              usersProvider
 	findNumberPositionProvider findNumberPositionProvider
+}
+
+func (g *GatewayService) Shutdown() {
+	if g.usersProvider != nil {
+		g.usersProvider.Shutdown()
+	}
+
+	if g.findNumberPositionProvider != nil {
+		g.findNumberPositionProvider.Shutdown()
+	}
 }
 
 func (g *GatewayService) FindNumberPosition(ctx context.Context, number int) (int, error) {

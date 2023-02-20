@@ -19,8 +19,12 @@ type UsersProvider struct {
 	usersAPIConnector usersAPIConnector
 }
 
+func (f *UsersProvider) Shutdown() {
+	f.grpClient.CloseConnection()
+}
+
 func (u *UsersProvider) GetUsers(ctx context.Context) ([]*models.User, error) {
-	usersResponse, err := u.usersAPIConnector.GetUsers(ctx, nil)
+	usersResponse, err := u.usersAPIConnector.GetUsers(ctx, &usersApi.GetUsersRequest{})
 	if err != nil {
 		return nil, errors.Wrap(err, "usersAPIConnector GetUsers")
 	}
