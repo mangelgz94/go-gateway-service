@@ -1,0 +1,13 @@
+FROM alpine:latest as alpine
+RUN apk add --nocache tzdata ca-certificates
+
+FROM golang:1.19 as gobuild
+
+ENV CGO_ENABLE 0
+ARG VERSION
+
+WORKDIR /opt
+
+COPY . .
+
+CMD cd end_to_end_tests/ && go test  ./... --tags=end_to_end_test

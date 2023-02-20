@@ -78,8 +78,11 @@ func (g *GrpcServer) newServices() error {
 	if err != nil {
 		return errors.Wrap(err, "filepath Abs")
 	}
+
+	fileDirectory = wd + fileDirectory
+	log.Infof("file directory %s", fileDirectory)
 	repository := file.New(&file.Config{
-		FileDirectory: wd + fileDirectory,
+		FileDirectory: fileDirectory,
 	})
 
 	g.usersService = users.New(repository)

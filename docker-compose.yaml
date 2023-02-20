@@ -1,0 +1,50 @@
+version: "3.1"
+services:
+  users-api:
+    build: .
+    networks:
+      - gateway
+    restart: always
+    ports:
+      - "50051:50051"
+    entrypoint: /opt/users
+  find-number-position:
+    build: .
+    networks:
+      - gateway
+    restart: always
+    ports:
+      - "50052:50052"
+    entrypoint: /opt/find_number_position
+  gateway-api:
+    build: .
+    networks:
+      - gateway
+    restart: always
+    depends_on:
+      - users-api
+      - find-number-position
+    ports:
+      - "8090:8090"
+    environment:
+      GRPC_USERS_ADDRESS: users-api:50051
+      GRPC_FIND_NUMBER_POSITION_ADDRESS: find-number-position:50052
+      AUTH_USER: admin
+      AUTH_PASSWORD: password
+  end-to-end-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.end_to_end_test
+    networks:
+      - gateway
+    depends_on:
+      - gateway-api
+    environment:
+      BASE_SERVICE_URL: http://gateway-api:8090
+      AUTH_USER: admin
+      AUTH_PASSWORD: password
+      ARRAY_SIZE: 100
+
+networks:
+  gateway:
+    driver: bridge
